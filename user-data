@@ -43,3 +43,36 @@ WantedBy=multi-user.target
 EOL
 sudo systemctl enable --now kafka-zookeeper.service
 sudo systemctl enable --now kafka.service
+cat > example.txt <<EOL
+
+Small Test
+
+Create Topic
+bin/kafka-topics.sh --create --bootstrap-server localhost:9092 --topic data  --partitions 4 --replication-factor 1
+
+Confirm it was created
+bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+bin/kafka-topics.sh --describe --topic data --bootstrap-server localhost:9092
+
+Write to the topic
+bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic data
+
+Paste the records below one at a time.
+{"id": "1", "group": "100", "seg": "1"} 
+{"id": "2", "group": "110", "seg": "2"} 
+{"id": "3", "group": "130", "seg": "3"}
+{"id": "2", "group": "120", "seg": "6"}
+
+crtl+c to get out of the console producer.
+
+Confirm the records were successfully written to the topic
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic data --from-beginning
+
+crtl+c to get out of the console consumer.
+
+Delete the topic.
+bin/kafka-topics.sh --delete --bootstrap-server localhost:9092 --topic data
+
+Confirm it deleted.
+bin/kafka-topics.sh --list --bootstrap-server localhost:9092
+EOL
