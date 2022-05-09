@@ -1,9 +1,15 @@
 #!/bin/bash
+
+# kafka specs
+KAFKA_RELEASE=3.0.1
+KAFKA_VERSION=kafka_2.12-3.0.1
+
+# install kakfa
 yum update -y
 sudo yum install -y java-1.8.0-openjdk
 mkdir /home/ec2-user/kafka
-wget -P /home/ec2-user/kafka/ https://downloads.apache.org/kafka/3.0.1/kafka_2.12-3.0.1.tgz
-tar -xvzf /home/ec2-user/kafka/kafka_2.12-3.0.1.tgz --strip 1 -C /home/ec2-user/kafka/
+wget -P /home/ec2-user/kafka/ https://downloads.apache.org/kafka/$KAFKA_RELEASE/$KAFKA_VERSION.tgz
+tar -xvzf /home/ec2-user/kafka/$KAFKA_VERSION.tgz --strip 1 -C /home/ec2-user/kafka/
 useradd kafka
 chown ec2-user:ec2-user -R /home/ec2-user/kafka
 pip3 install kafka-python
