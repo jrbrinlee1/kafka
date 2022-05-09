@@ -1,0 +1,45 @@
+#!/bin/bash
+yum update -y
+sudo yum install -y java-1.8.0-openjdk
+mkdir /home/ec2-user/kafka
+wget -P /home/ec2-user/kafka/ https://downloads.apache.org/kafka/3.0.1/kafka_2.12-3.0.1.tgz
+tar -xvzf /home/ec2-user/kafka/kafka_2.12-3.0.1.tgz --strip 1 -C /home/ec2-user/kafka/
+useradd kafka
+chown ec2-user:ec2-user -R /home/ec2-user/kafka
+pip3 install kafka-python
+cat > /etc/systemd/system/kafka-zookeeper.service <<EOL
+[Unit]
+Description=Apache Zookeeper server (Kafka)
+Documentation=http://zookeeper.apache.org
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target
+
+[Service]
+Type=simple
+User=ec2-user
+#Environment=JAVA_HOME=/usr/bin/java
+ExecStart=/home/ec2-user/kafka/bin/zookeeper-server-start.sh /home/ec2-user/kafka/config/zookeeper.properties
+ExecStop=/home/ec2-user/kafka/bin/zookeeper-server-stop.sh
+
+[Install]
+WantedBy=multi-user.target
+EOL
+cat > /etc/systemd/system/kafka.service <<EOL
+[Unit]
+Description=Apache Kafka server
+Documentation=http://zookeeper.apache.org
+Requires=network.target remote-fs.target
+After=network.target remote-fs.target kafka-zookeeper.service
+
+[Service]
+Type=simple
+User=ec2-user
+#Environment=JAVA_HOME=/usr/bin/java
+ExecStart=/home/ec2-user/kafka/bin/kafka-server-start.sh /home/ec2-user/kafka/config/server.properties
+ExecStop=/home/ec2-user/kafka/bin/kafka-server-stop.sh
+
+[Install]
+WantedBy=multi-user.target
+EOL
+sudo systemctl enable --now kafka-zookeeper.service
+sudo systemctl enable --now kafka.service
