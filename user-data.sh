@@ -5,15 +5,19 @@ KAFKA_RELEASE=3.0.1
 KAFKA_VERSION=kafka_2.12-3.0.1
 
 # install kakfa
-yum update -y
+sudo yum update -y
 sudo yum install -y java-1.8.0-openjdk
-mkdir /home/ec2-user/kafka
-wget -P /home/ec2-user/kafka/ https://downloads.apache.org/kafka/$KAFKA_RELEASE/$KAFKA_VERSION.tgz
-tar -xvzf /home/ec2-user/kafka/$KAFKA_VERSION.tgz --strip 1 -C /home/ec2-user/kafka/
-useradd kafka
-chown ec2-user:ec2-user -R /home/ec2-user/kafka
-pip3 install kafka-python
-cat > /etc/systemd/system/kafka-zookeeper.service <<EOL
+sudo mkdir /home/ec2-user/kafka
+sudo wget -P /home/ec2-user/kafka/ https://downloads.apache.org/kafka/$KAFKA_RELEASE/$KAFKA_VERSION.tgz
+sudo tar -xvzf /home/ec2-user/kafka/$KAFKA_VERSION.tgz --strip 1 -C /home/ec2-user/kafka/
+sudo useradd kafka
+sudo chown ec2-user:ec2-user -R /home/ec2-user/kafka
+sudo pip3 install kafka-python
+
+sudo touch /etc/systemd/system/kafka-zookeeper.service
+sudo touch /etc/systemd/system/kafka.service
+
+sudo tee /etc/systemd/system/kafka-zookeeper.service <<EOL
 [Unit]
 Description=Apache Zookeeper server (Kafka)
 Documentation=http://zookeeper.apache.org
@@ -30,7 +34,8 @@ ExecStop=/home/ec2-user/kafka/bin/zookeeper-server-stop.sh
 [Install]
 WantedBy=multi-user.target
 EOL
-cat > /etc/systemd/system/kafka.service <<EOL
+
+sudo tee sudo /etc/systemd/system/kafka.service <<EOL
 [Unit]
 Description=Apache Kafka server
 Documentation=http://zookeeper.apache.org
@@ -47,9 +52,11 @@ ExecStop=/home/ec2-user/kafka/bin/kafka-server-stop.sh
 [Install]
 WantedBy=multi-user.target
 EOL
+
 sudo systemctl enable --now kafka-zookeeper.service
 sudo systemctl enable --now kafka.service
-cat > example.txt <<EOL
+
+sudo cat > example.txt <<EOL
 
 Small Test
 
